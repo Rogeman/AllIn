@@ -6,6 +6,5 @@ package lu.bitcoinfund;
 public class AllIn {
     public static void main(String[] args) {
         System.out.println("All In!");
-        System.out.println("HODLERS !");
     }
 }
