@@ -1,9 +1,27 @@
 package lu.bitcoinfund;
 
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.utils.*;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.http.client.methods.*;
+import org.apache.http.NameValuePair;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 
 /**
  * Created by Roge on 18.01.2018.
@@ -27,6 +45,65 @@ public class AllIn {
         -d 'quantity=1&price=0.1&recvWindow=6000000&timestamp=1499827319559&signature=0fd168b8ddb4876a0358a8d14d0c9f3da0e9b20c5d52b2a00fcf7d1c602f9a77'
         */
 
+        URI uri = null;
+        try {
+            uri = new URIBuilder()
+                    .setScheme("https")
+                    .setHost("api.binance.com")
+                    .setPath("/api/v3/order")
+                    .setParameter("symbol", "LTCBTC")
+                    .setParameter("side", "BUY")
+                    .setParameter("type", "LIMIT")
+                    .setParameter("timeInForce", "GTC")
+                    .build();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        HttpPost httppost = new HttpPost(uri);
+        httppost.addHeader("X-MBX-APIKEY",apiKey);
 
+        System.out.println(httppost.getURI());
+        List<NameValuePair> params = new ArrayList<NameValuePair>(2);
+        params.add(new BasicNameValuePair("quantity", "1"));
+        params.add(new BasicNameValuePair("price", "0.1"));
+        params.add(new BasicNameValuePair("recvWindow", "6000000"));
+        params.add(new BasicNameValuePair("timestamp",Long.toString(unixTime)));
+        params.add(new BasicNameValuePair("signature",hashSignature));
+        try {
+            httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        System.out.println(httppost.toString());
+        HttpClient httpclient = new DefaultHttpClient();
+        //Execute and get the response.
+        HttpResponse response = null;
+        try {
+            response = httpclient.execute(httppost);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        HttpEntity entity = response.getEntity();
+
+        if (entity != null) {
+            InputStream instream = null;
+            try {
+                instream = entity.getContent();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                System.out.println(EntityUtils.toString(entity));
+                // do something useful
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    instream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

@@ -40,7 +40,7 @@ public abstract class HashSigner {
             // TODO Auto-generated catch block
             e.printStackTrace();
         } finally {
-            System.out.println("Done");
+
             return result;
         }
     }
