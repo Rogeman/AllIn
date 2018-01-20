@@ -93,7 +93,7 @@ public class AllIn {
                 e.printStackTrace();
             }
             try {
-                System.out.println(EntityUtils.toString(entity));
+                System.out.println("Response from server:"+EntityUtils.toString(entity));
                 // do something useful
             } catch (IOException e) {
                 e.printStackTrace();
